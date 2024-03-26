@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import multiprocessing as mp
+import matplotlib.pyplot as plt
 import csv
 
 # If using different file, please change:
@@ -48,10 +49,25 @@ class MapReduce:
                 reduce_in = self.shuffle(map_out)
                 reduce_out = pool.map(self.reduce, reduce_in.items())
 
-        frequent_flyer = reduce_out[0]
+        # sort the data in descending order
+        sorted_data = sorted(reduce_out, key=lambda x: x[1], reverse=True)
+
+        frequent_flyer = sorted_data[0]
         print(f"The passenger with the most flights is passenger {frequent_flyer[0]} with a total of {frequent_flyer[1]} flights.")
+
+        return sorted_data
 
 
 if __name__ == '__main__':
-   map_reduce = MapReduce(input_file_path)
-   map_reduce.run()
+    map_reduce = MapReduce(input_file_path)
+    reduced_data = map_reduce.run()
+
+    # pick out the top 3 most frequent flyers
+    top_ids = [i[0] for i in reduced_data[:3]]
+    counts = [i[1] for i in reduced_data[:3]]
+
+    # plot top 3 frequent flyers on bar chart
+    plt.figure()
+    plt.bar(top_ids, counts)
+    plt.title(f"Top three passengers. Most flights: {top_ids[0]} ({counts[0]} flights)")
+    plt.show()
