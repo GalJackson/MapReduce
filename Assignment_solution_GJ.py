@@ -9,6 +9,7 @@ import csv
 input_file_path = r'./AComp_Passenger_data_no_error.csv'
 
 class MapReduce:
+    """A MapReduce class designed to count the amount of flights per passenger"""
     def __init__(self, file_path):
         self.file_path = file_path
 
@@ -21,7 +22,7 @@ class MapReduce:
 
 
     def shuffle(self, mapper_out): 
-        """ Organise the mapped values by key """ 
+        # Organise the mapped values by key 
         data = {} 
         for k, v in filter(None, mapper_out): 
             if k not in data: 
@@ -32,6 +33,7 @@ class MapReduce:
 
 
     def reduce(self, kv):
+        # aggregate the list of values for each key (passenger)
         k, v = kv
         return k, sum(v)
     
@@ -59,6 +61,7 @@ class MapReduce:
 
 
 class MapReduceDuration(MapReduce):
+    """A MapReduce class designed to aggregate total flight duration per passenger"""
     def map(self, line):
         # override parent - return the flight duration as a value for each passenger in the CSV
         try:
@@ -81,6 +84,7 @@ if __name__ == '__main__':
     plt.title(f"Top three passengers. Most flights: {top_ids[0]} ({counts[0]} flights)")
     plt.show()
 
+    # Run MapReduce again, but aggregate flight duration instead of flight count
     map_reduce_duration = MapReduceDuration(input_file_path)
     reduced_data_duration = map_reduce_duration.run()
 
